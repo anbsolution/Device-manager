@@ -9,15 +9,26 @@ data class AppUsage(
     val lastUsed: Long
 )
 
+data class UsageSummary(
+    val periodDays: Int,
+    val totalUsageMs: Long,
+    val appCount: Int,
+    val apps: List<AppUsage>
+)
+
 class UsageMonitor(private val context: Context) {
 
     fun getDailyUsage(): List<AppUsage> {
+        return getUsageForDays(1)
+    }
+
+    fun getUsageForDays(days: Int): List<AppUsage> {
         val manager = context.getSystemService(
             Context.USAGE_STATS_SERVICE
         ) as UsageStatsManager
 
         val end = System.currentTimeMillis()
-        val start = end - 24L * 60 * 60 * 1000
+        val start = end - days.coerceIn(1, 30) * 24L * 60 * 60 * 1000
 
         return manager.queryAndAggregateUsageStats(
             start, end
@@ -27,6 +38,18 @@ class UsageMonitor(private val context: Context) {
                 usageTime = stats.totalTimeInForeground,
                 lastUsed = stats.lastTimeUsed
             )
-        }.sortedByDescending { it.usageTime }
+        }.filter { it.usageTime > 0 }
+            .sortedByDescending { it.usageTime }
+    }
+
+    fun getSummary(days: Int): UsageSummary {
+        val apps = getUsageForDays(days)
+
+        return UsageSummary(
+            periodDays = days,
+            totalUsageMs = apps.sumOf { it.usageTime },
+            appCount = apps.size,
+            apps = apps
+        )
     }
 }

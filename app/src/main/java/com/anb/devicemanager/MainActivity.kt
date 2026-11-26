@@ -22,6 +22,7 @@ import com.anb.devicemanager.ui.StorageIntelligencePanel
 import com.anb.devicemanager.ui.PermissionIntelligencePanel
 
 import com.anb.devicemanager.ui.DeviceDiagnosticsPanel
+import com.anb.devicemanager.ui.UsageIntelligencePanel
 
 
 class MainActivity : ComponentActivity() {
@@ -170,6 +171,16 @@ fun Dashboard(
                 AppManagerPanel(
                     context = context,
                     apps = apps
+                )
+            }
+
+            item {
+                UsageIntelligencePanel(
+                    context = context,
+                    usageAccess = usageAccess,
+                    appNames = apps.associate {
+                        it.packageName to it.name
+                    }
                 )
             }
 
