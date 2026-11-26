@@ -31,7 +31,7 @@ fun SystemMetricsPanel(context: Context) {
 
     fun refresh() {
         performance = PerformanceMonitor(context).getMetrics()
-        storage = StorageMonitor().getStorageInfo()
+        storage = StorageMonitor(context).getStorageInfo()
         network = NetworkMonitor(context).getNetworkInfo()
 
         backgroundEvents = try {
