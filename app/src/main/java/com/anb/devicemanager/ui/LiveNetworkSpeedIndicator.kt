@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.anb.devicemanager.monitoring.readNetworkSignal
+import com.anb.devicemanager.monitoring.NetworkSignalAlertMonitor
 import kotlinx.coroutines.delay
 import java.util.Locale
 
@@ -71,7 +72,9 @@ fun LiveNetworkSpeedIndicator(context: Context) {
             } else 0L
 
             available = valid
-            signal = readNetworkSignal(context)
+            val latestSignal = readNetworkSignal(context)
+            signal = latestSignal
+            NetworkSignalAlertMonitor.evaluate(context, latestSignal)
 
             oldRx = rx
             oldTx = tx

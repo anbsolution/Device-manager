@@ -45,6 +45,7 @@ import com.anb.devicemanager.ui.NetworkInsightsPanel
 import com.anb.devicemanager.ui.LiveNetworkSpeedPanel
 import com.anb.devicemanager.ui.LiveNetworkSpeedIndicator
 import com.anb.devicemanager.ui.NetworkSignalHistoryPanel
+import com.anb.devicemanager.ui.NetworkSignalAlertPanel
 
 
 class MainActivity : ComponentActivity() {
@@ -240,6 +241,10 @@ fun Dashboard(
 
             item {
                 NetworkSignalHistoryPanel(context)
+            }
+
+            item {
+                NetworkSignalAlertPanel(context)
             }
 
             item {
