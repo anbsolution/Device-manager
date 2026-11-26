@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.anb.devicemanager.monitoring.*
 import com.anb.devicemanager.ui.SystemMetricsPanel
+import com.anb.devicemanager.ui.AppManagerPanel
 
 
 class MainActivity : ComponentActivity() {
@@ -172,24 +173,10 @@ fun Dashboard(
             }
 
             item {
-                Text(
-                    "Installed Apps",
-                    style = MaterialTheme.typography.titleLarge
+                AppManagerPanel(
+                    context = context,
+                    apps = apps
                 )
-            }
-
-            items(apps, key = { it.packageName }) { app ->
-                ListItem(
-                    headlineContent = { Text(app.name) },
-                    supportingContent = {
-                        Text(
-                            app.packageName +
-                                if (app.systemApp) " • System App"
-                                else " • User App"
-                        )
-                    }
-                )
-                HorizontalDivider()
             }
 
             item {
