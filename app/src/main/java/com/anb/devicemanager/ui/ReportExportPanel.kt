@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.anb.devicemanager.monitoring.*
+import org.json.JSONArray
 
 @Composable
 fun ReportExportPanel(
@@ -52,6 +53,7 @@ fun ReportExportPanel(
             Text("• Device and Android diagnostics")
             Text("• Available hardware sensors")
             Text("• Saved battery history")
+            Text("• Saved network history and traffic counters")
             Text("• App usage summary (when Usage Access is enabled)")
 
             Button(
@@ -88,6 +90,25 @@ private fun createDeviceReport(
         emptyList()
     }
 
+    val networkHistory = runCatching {
+        val raw = context.getSharedPreferences(
+            "anb_network_history",
+            Context.MODE_PRIVATE
+        ).getString("records", "[]") ?: "[]"
+        val json = JSONArray(raw)
+        (0 until json.length()).map { index ->
+            val item = json.getJSONObject(index)
+            listOf(
+                item.optLong("timestamp").toString(),
+                item.optString("type"),
+                item.optLong("received").toString(),
+                item.optLong("transmitted").toString(),
+                item.optBoolean("validated").toString(),
+                item.optBoolean("metered").toString()
+            )
+        }
+    }.getOrDefault(emptyList())
+
     val rows = mutableListOf<List<String>>()
 
     fun add(vararg values: Any?) {
@@ -119,6 +140,22 @@ private fun createDeviceReport(
     add("Timestamp", "Percentage", "Temperature C", "Charging")
     batteryHistory.forEach {
         add(it.timestamp, it.percentage, it.temperature, it.charging)
+    }
+    add("")
+    add("NETWORK HISTORY")
+    add(
+        "Timestamp",
+        "Connection Type",
+        "Received Bytes",
+        "Transmitted Bytes",
+        "Internet Validated",
+        "Metered"
+    )
+    networkHistory.forEach { row ->
+        add(*row.toTypedArray())
+    }
+    if (networkHistory.isEmpty()) {
+        add("No saved network snapshots")
     }
     add("")
     add("APP USAGE - LAST 30 DAYS")
