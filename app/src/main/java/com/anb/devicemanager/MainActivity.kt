@@ -18,6 +18,7 @@ import com.anb.devicemanager.monitoring.*
 import com.anb.devicemanager.ui.SystemMetricsPanel
 import com.anb.devicemanager.ui.BatteryIntelligencePanel
 import com.anb.devicemanager.ui.AppManagerPanel
+import com.anb.devicemanager.ui.StorageIntelligencePanel
 
 
 class MainActivity : ComponentActivity() {
@@ -119,6 +120,10 @@ fun Dashboard(
 
             item {
                 BatteryIntelligencePanel(context)
+            }
+
+            item {
+                StorageIntelligencePanel(context)
             }
 
             item {
