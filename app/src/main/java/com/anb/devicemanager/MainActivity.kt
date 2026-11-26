@@ -31,6 +31,7 @@ import com.anb.devicemanager.ui.LocalBackupPanel
 import com.anb.devicemanager.ui.UsageIntelligencePanel
 import com.anb.devicemanager.ui.MaintenanceRecommendationsPanel
 import com.anb.devicemanager.ui.DeviceSecurityInsightsPanel
+import com.anb.devicemanager.ui.DeviceCapabilityPanel
 
 
 class MainActivity : ComponentActivity() {
@@ -168,6 +169,10 @@ fun Dashboard(
 
             item {
                 DeviceSecurityInsightsPanel(context)
+            }
+
+            item {
+                DeviceCapabilityPanel(context)
             }
 
             item {
