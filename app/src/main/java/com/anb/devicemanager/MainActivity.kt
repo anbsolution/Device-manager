@@ -38,6 +38,7 @@ import com.anb.devicemanager.ui.BatteryAnalyticsPanel
 import com.anb.devicemanager.ui.NetworkHistoryPanel
 import com.anb.devicemanager.ui.ConnectivityDiagnosticsPanel
 import com.anb.devicemanager.ui.NetworkStabilityPanel
+import com.anb.devicemanager.ui.NetworkTrafficAnalyticsPanel
 
 
 class MainActivity : ComponentActivity() {
@@ -205,6 +206,11 @@ fun Dashboard(
 
             item {
                 NetworkStabilityPanel(context)
+            }
+
+
+            item {
+                NetworkTrafficAnalyticsPanel(context)
             }
 
             item {
