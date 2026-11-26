@@ -21,6 +21,8 @@ import com.anb.devicemanager.ui.AppManagerPanel
 import com.anb.devicemanager.ui.StorageIntelligencePanel
 import com.anb.devicemanager.ui.PermissionIntelligencePanel
 
+import com.anb.devicemanager.ui.DeviceDiagnosticsPanel
+
 
 class MainActivity : ComponentActivity() {
 
@@ -129,6 +131,10 @@ fun Dashboard(
 
             item {
                 PermissionIntelligencePanel(context)
+            }
+
+            item {
+                DeviceDiagnosticsPanel(context)
             }
 
             item {
