@@ -140,27 +140,57 @@ fun SystemMetricsPanel(context: Context) {
 
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp)) {
-                Text("Network")
+                Text("Network Intelligence",
+                    style = MaterialTheme.typography.titleLarge)
+
                 Text(
                     network?.connectionType ?: "Unavailable",
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.headlineSmall
                 )
+
                 Text(
-                    "App received: ${
-                        network?.let {
-                            formatBytes(it.receivedBytes)
-                        } ?: "Unavailable"
-                    }"
+                    if (network?.internetValidated == true)
+                        "Internet: Validated"
+                    else if (network?.internetConfigured == true)
+                        "Internet: Not validated"
+                    else "Internet: Unavailable"
                 )
+
                 Text(
-                    "App transmitted: ${
-                        network?.let {
-                            formatBytes(it.transmittedBytes)
-                        } ?: "Unavailable"
-                    }"
+                    "Connection: " +
+                        if (network?.connected == true) "Connected"
+                        else "Disconnected"
                 )
-                Text("Traffic values are for this app only")
+
+                Text(
+                    "Data plan: " +
+                        if (network?.metered == true) "Metered"
+                        else "Unmetered / Unknown"
+                )
+
+                Text("VPN: ${
+                    if (network?.vpnActive == true) "Active" else "Not detected"
+                }")
+
+                Text("Estimated download: ${
+                    network?.downloadKbps?.let { "$it Kbps" } ?: "Unavailable"
+                }")
+
+                Text("Estimated upload: ${
+                    network?.uploadKbps?.let { "$it Kbps" } ?: "Unavailable"
+                }")
+
+                HorizontalDivider()
+
+                Text("ANB app received: ${
+                    network?.let { formatBytes(it.receivedBytes) } ?: "Unavailable"
+                }")
+
+                Text("ANB app transmitted: ${
+                    network?.let { formatBytes(it.transmittedBytes) } ?: "Unavailable"
+                }")
+
+                Text("Traffic counters belong to this app only.")
             }
-        }
-    }
+        }    }
 }
