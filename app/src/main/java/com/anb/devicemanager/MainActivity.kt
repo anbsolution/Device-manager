@@ -47,6 +47,9 @@ import com.anb.devicemanager.ui.LiveNetworkSpeedIndicator
 import com.anb.devicemanager.ui.NetworkSignalHistoryPanel
 import com.anb.devicemanager.ui.NetworkSignalAlertPanel
 import com.anb.devicemanager.ui.NetworkQualityDiagnosticsPanel
+import com.anb.devicemanager.ui.ThemeSettingsPanel
+import com.anb.devicemanager.ui.theme.AnbThemeMode
+import com.anb.devicemanager.ui.theme.AnbDeviceManagerTheme
 
 
 class MainActivity : ComponentActivity() {
@@ -55,9 +58,27 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            MaterialTheme {
+            val themePrefs = remember {
+                getSharedPreferences("anb_ui_preferences", Context.MODE_PRIVATE)
+            }
+            var themeMode by remember {
+                mutableStateOf(
+                    runCatching {
+                        AnbThemeMode.valueOf(
+                            themePrefs.getString("theme_mode", "ADAPTIVE") ?: "ADAPTIVE"
+                        )
+                    }.getOrDefault(AnbThemeMode.ADAPTIVE)
+                )
+            }
+
+            AnbDeviceManagerTheme(mode = themeMode) {
                 Dashboard(
                     context = this,
+                    themeMode = themeMode,
+                    onThemeChange = { mode ->
+                        themeMode = mode
+                        themePrefs.edit().putString("theme_mode", mode.name).apply()
+                    },
                     openUsageSettings = {
                         startActivity(
                             Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
@@ -73,6 +94,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Dashboard(
     context: Context,
+    themeMode: AnbThemeMode,
+    onThemeChange: (AnbThemeMode) -> Unit,
     openUsageSettings: () -> Unit
 ) {
     var apps by remember {
@@ -142,6 +165,14 @@ fun Dashboard(
                 Text(
                     "Device Overview",
                     style = MaterialTheme.typography.headlineMedium
+                )
+            }
+
+            item {
+                ThemeSettingsPanel(
+                    context = context,
+                    selectedMode = themeMode,
+                    onModeChange = onThemeChange
                 )
             }
 
