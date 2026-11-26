@@ -45,7 +45,7 @@ fun ConnectivityDiagnosticsPanel(context: Context) {
             ?: emptyList()
 
         val routes = links?.routes
-            ?.filter { it.isDefault }
+            ?.filter { it.destination.prefixLength == 0 }
             ?.mapNotNull { it.gateway?.hostAddress }
             ?: emptyList()
 
