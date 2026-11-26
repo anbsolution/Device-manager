@@ -22,6 +22,7 @@ import com.anb.devicemanager.ui.StorageIntelligencePanel
 import com.anb.devicemanager.ui.PermissionIntelligencePanel
 
 import com.anb.devicemanager.ui.DeviceDiagnosticsPanel
+import com.anb.devicemanager.ui.DeviceHealthPanel
 import com.anb.devicemanager.ui.UsageIntelligencePanel
 
 
@@ -136,6 +137,10 @@ fun Dashboard(
 
             item {
                 DeviceDiagnosticsPanel(context)
+            }
+
+            item {
+                DeviceHealthPanel(context)
             }
 
             item {
