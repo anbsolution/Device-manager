@@ -24,6 +24,7 @@ import com.anb.devicemanager.ui.PermissionIntelligencePanel
 import com.anb.devicemanager.ui.DeviceDiagnosticsPanel
 import com.anb.devicemanager.ui.DeviceHealthPanel
 import com.anb.devicemanager.ui.ReportExportPanel
+import com.anb.devicemanager.ui.LocalBackupPanel
 import com.anb.devicemanager.ui.UsageIntelligencePanel
 
 
@@ -149,6 +150,10 @@ fun Dashboard(
                     context = context,
                     usageAccess = usageAccess
                 )
+            }
+
+            item {
+                LocalBackupPanel(context)
             }
 
             item {
