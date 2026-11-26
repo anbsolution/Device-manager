@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.anb.devicemanager.monitoring.*
 import com.anb.devicemanager.ui.SystemMetricsPanel
 import com.anb.devicemanager.ui.DashboardQuickStatusPanel
+import com.anb.devicemanager.ui.DeviceIdentityPanel
 import com.anb.devicemanager.ui.BatteryIntelligencePanel
 import com.anb.devicemanager.ui.AppManagerPanel
 import com.anb.devicemanager.ui.StorageIntelligencePanel
@@ -186,6 +187,7 @@ fun Dashboard(
                     item {
                         Text("Device Overview", style = MaterialTheme.typography.headlineMedium)
                     }
+                    item { DeviceIdentityPanel() }
                     item {
                         DashboardQuickStatusPanel(
                             appCount = apps.size,
