@@ -1,6 +1,7 @@
 package com.anb.devicemanager.monitoring
 
 import android.content.Context
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PermissionInfo
 
@@ -29,7 +30,8 @@ class PermissionMonitor(private val context: Context) {
         return try {
             pm.getInstalledPackages(PackageManager.GET_PERMISSIONS)
                 .mapNotNull { pkg ->
-                    val names = pkg.requestedPermissions ?: return@mapNotNull null
+                    val names = pkg.requestedPermissions
+                        ?: return@mapNotNull null
                     val flags = pkg.requestedPermissionsFlags
 
                     val dangerous = names.mapIndexedNotNull { index, name ->
@@ -40,21 +42,26 @@ class PermissionMonitor(private val context: Context) {
                         } ?: return@mapIndexedNotNull null
 
                         val isDangerous =
-                            permissionInfo.protectionLevel and
-                                PermissionInfo.PROTECTION_MASK_BASE ==
+                            (permissionInfo.protectionLevel and
+                                PermissionInfo.PROTECTION_MASK_BASE) ==
                                 PermissionInfo.PROTECTION_DANGEROUS
 
-                        if (!isDangerous) return@mapIndexedNotNull null
+                        if (!isDangerous) {
+                            return@mapIndexedNotNull null
+                        }
+
+                        val permissionFlags = flags?.getOrNull(index) ?: 0
 
                         AppPermission(
                             name = name,
-                            granted = flags?.getOrNull(index)?.and(
-                                PackageManager.REQUESTED_PERMISSION_GRANTED
-                            ) != 0
+                            granted = (permissionFlags and
+                                PackageInfo.REQUESTED_PERMISSION_GRANTED) != 0
                         )
                     }
 
-                    if (dangerous.isEmpty()) return@mapNotNull null
+                    if (dangerous.isEmpty()) {
+                        return@mapNotNull null
+                    }
 
                     AppPermissionInfo(
                         appName = pkg.applicationInfo?.loadLabel(pm)?.toString()
