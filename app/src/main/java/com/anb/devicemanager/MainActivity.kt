@@ -39,6 +39,7 @@ import com.anb.devicemanager.ui.NetworkHistoryPanel
 import com.anb.devicemanager.ui.ConnectivityDiagnosticsPanel
 import com.anb.devicemanager.ui.NetworkStabilityPanel
 import com.anb.devicemanager.ui.NetworkTrafficAnalyticsPanel
+import com.anb.devicemanager.ui.NetworkExportPanel
 
 
 class MainActivity : ComponentActivity() {
@@ -211,6 +212,10 @@ fun Dashboard(
 
             item {
                 NetworkTrafficAnalyticsPanel(context)
+            }
+
+            item {
+                NetworkExportPanel(context)
             }
 
             item {
