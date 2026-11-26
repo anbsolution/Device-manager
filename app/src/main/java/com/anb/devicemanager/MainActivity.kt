@@ -50,6 +50,7 @@ import com.anb.devicemanager.ui.NetworkSignalHistoryPanel
 import com.anb.devicemanager.ui.NetworkSignalAlertPanel
 import com.anb.devicemanager.ui.NetworkQualityDiagnosticsPanel
 import com.anb.devicemanager.ui.ThemeSettingsPanel
+import com.anb.devicemanager.ui.LicenseCenterPanel
 import com.anb.devicemanager.ui.theme.AnbThemeMode
 import com.anb.devicemanager.ui.theme.AnbDeviceManagerTheme
 
@@ -289,6 +290,7 @@ fun Dashboard(
                     item {
                         Text("Device Tools & Settings", style = MaterialTheme.typography.headlineMedium)
                     }
+                    item { LicenseCenterPanel(context) }
                     item {
                         ThemeSettingsPanel(
                             context = context,
