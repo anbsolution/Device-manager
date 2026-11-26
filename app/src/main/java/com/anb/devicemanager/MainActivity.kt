@@ -43,6 +43,7 @@ import com.anb.devicemanager.ui.NetworkExportPanel
 import com.anb.devicemanager.ui.NetworkBackupPanel
 import com.anb.devicemanager.ui.NetworkInsightsPanel
 import com.anb.devicemanager.ui.LiveNetworkSpeedPanel
+import com.anb.devicemanager.ui.LiveNetworkSpeedIndicator
 
 
 class MainActivity : ComponentActivity() {
@@ -114,14 +115,17 @@ fun Dashboard(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("ANB Device Manager") },
-                actions = {
-                    TextButton(onClick = { refresh() }) {
-                        Text("Refresh")
+            Column {
+                TopAppBar(
+                    title = { Text("ANB Device Manager") },
+                    actions = {
+                        TextButton(onClick = { refresh() }) {
+                            Text("Refresh")
+                        }
                     }
-                }
-            )
+                )
+                LiveNetworkSpeedIndicator(context)
+            }
         }
     ) { padding ->
         LazyColumn(
