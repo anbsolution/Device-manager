@@ -114,6 +114,10 @@ fun Dashboard(
         mutableStateOf(false)
     }
 
+    var selectedTab by remember {
+        mutableStateOf(0)
+    }
+
     fun refresh() {
         apps = AppInventoryMonitor(context).getInstalledApps()
         battery = BatteryMonitor(context).getBatteryInfo()
@@ -152,6 +156,21 @@ fun Dashboard(
                 )
                 LiveNetworkSpeedIndicator(context)
             }
+        },
+        bottomBar = {
+            NavigationBar {
+                val labels = listOf("Home", "Network", "Battery", "Apps", "Tools")
+                val symbols = listOf("⌂", "◉", "▰", "▦", "⚙")
+
+                labels.forEachIndexed { index, label ->
+                    NavigationBarItem(
+                        selected = selectedTab == index,
+                        onClick = { selectedTab = index },
+                        icon = { Text(symbols[index]) },
+                        label = { Text(label) }
+                    )
+                }
+            }
         }
     ) { padding ->
         LazyColumn(
@@ -161,205 +180,128 @@ fun Dashboard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item {
-                Text(
-                    "Device Overview",
-                    style = MaterialTheme.typography.headlineMedium
-                )
-            }
-
-            item {
-                ThemeSettingsPanel(
-                    context = context,
-                    selectedMode = themeMode,
-                    onModeChange = onThemeChange
-                )
-            }
-
-            item {
-                SystemMetricsPanel(context)
-            }
-
-            item {
-                BatteryIntelligencePanel(context)
-            }
-
-            item {
-                StorageIntelligencePanel(context)
-            }
-
-            item {
-                PermissionIntelligencePanel(context)
-            }
-
-            item {
-                DeviceDiagnosticsPanel(context)
-            }
-
-            item {
-                DeviceHealthPanel(context)
-            }
-
-            item {
-                BackgroundMonitoringPanel(context)
-            }
-
-            item {
-                HealthTrendsPanel(context)
-            }
-
-            item {
-                DeviceAlertPanel(context)
-            }
-
-            item {
-                MaintenanceRecommendationsPanel(context)
-            }
-
-            item {
-                DeviceSecurityInsightsPanel(context)
-            }
-
-            item {
-                DeviceCapabilityPanel(context)
-            }
-
-            item {
-                DeviceActivityTimelinePanel(context)
-            }
-
-            item {
-                DeviceBenchmarkPanel(context)
-            }
-
-            item {
-                BatteryAnalyticsPanel(context)
-            }
-
-            item {
-                NetworkHistoryPanel(context)
-            }
-
-
-            item {
-                ConnectivityDiagnosticsPanel(context)
-            }
-
-
-            item {
-                NetworkStabilityPanel(context)
-            }
-
-
-            item {
-                NetworkTrafficAnalyticsPanel(context)
-            }
-
-            item {
-                NetworkExportPanel(context)
-            }
-
-            item {
-                NetworkBackupPanel(context)
-            }
-
-            item {
-                NetworkInsightsPanel(context)
-            }
-
-            item {
-                LiveNetworkSpeedPanel(context)
-            }
-
-            item {
-                NetworkSignalHistoryPanel(context)
-            }
-
-            item {
-                NetworkSignalAlertPanel(context)
-            }
-
-            item {
-                NetworkQualityDiagnosticsPanel(context)
-            }
-
-            item {
-                ReportExportPanel(
-                    context = context,
-                    usageAccess = usageAccess
-                )
-            }
-
-            item {
-                LocalBackupPanel(context)
-            }
-
-            item {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text("Installed Applications")
-                        Text(
-                            "${apps.size} Apps",
-                            style = MaterialTheme.typography.headlineMedium
-                        )
+            when (selectedTab) {
+                0 -> {
+                    item {
+                        Text("Device Overview", style = MaterialTheme.typography.headlineMedium)
                     }
+                    item { SystemMetricsPanel(context) }
+                    item { DeviceHealthPanel(context) }
+                    item { StorageIntelligencePanel(context) }
+                    item { HealthTrendsPanel(context) }
+                    item { MaintenanceRecommendationsPanel(context) }
+                    item { DeviceBenchmarkPanel(context) }
                 }
-            }
 
-            item {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text("App Usage Monitoring")
-                        Text(
-                            if (usageAccess) "Usage Access Enabled"
-                            else "Usage Access Required"
-                        )
-                        if (!usageAccess) {
-                            Button(onClick = openUsageSettings) {
-                                Text("Grant Usage Access")
+                1 -> {
+                    item {
+                        Text("Network Intelligence", style = MaterialTheme.typography.headlineMedium)
+                    }
+                    item { NetworkHistoryPanel(context) }
+                    item { ConnectivityDiagnosticsPanel(context) }
+                    item { NetworkStabilityPanel(context) }
+                    item { NetworkTrafficAnalyticsPanel(context) }
+                    item { NetworkExportPanel(context) }
+                    item { NetworkBackupPanel(context) }
+                    item { NetworkInsightsPanel(context) }
+                    item { LiveNetworkSpeedPanel(context) }
+                    item { NetworkSignalHistoryPanel(context) }
+                    item { NetworkSignalAlertPanel(context) }
+                    item { NetworkQualityDiagnosticsPanel(context) }
+                }
+
+                2 -> {
+                    item {
+                        Text("Battery & Power", style = MaterialTheme.typography.headlineMedium)
+                    }
+                    item { BatteryIntelligencePanel(context) }
+                    item { BatteryAnalyticsPanel(context) }
+                }
+
+                3 -> {
+                    item {
+                        Text("Applications", style = MaterialTheme.typography.headlineMedium)
+                    }
+                    item {
+                        Card(modifier = Modifier.fillMaxWidth()) {
+                            Column(Modifier.padding(16.dp)) {
+                                Text("Installed Applications")
+                                Text(
+                                    "${apps.size} Apps",
+                                    style = MaterialTheme.typography.headlineMedium
+                                )
                             }
                         }
                     }
-                }
-            }
-
-            item {
-                AppManagerPanel(
-                    context = context,
-                    apps = apps
-                )
-            }
-
-            item {
-                UsageIntelligencePanel(
-                    context = context,
-                    usageAccess = usageAccess,
-                    appNames = apps.associate {
-                        it.packageName to it.name
+                    item {
+                        Card(modifier = Modifier.fillMaxWidth()) {
+                            Column(Modifier.padding(16.dp)) {
+                                Text("App Usage Monitoring")
+                                Text(
+                                    if (usageAccess) "Usage Access Enabled"
+                                    else "Usage Access Required"
+                                )
+                                if (!usageAccess) {
+                                    Button(onClick = openUsageSettings) {
+                                        Text("Grant Usage Access")
+                                    }
+                                }
+                            }
+                        }
                     }
-                )
-            }
-
-            item {
-                Text(
-                    "Top App Usage (Last 24 Hours)",
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-
-            items(usage.take(10)) { item ->
-                val appName = apps.find {
-                    it.packageName == item.packageName
-                }?.name ?: item.packageName
-
-                ListItem(
-                    headlineContent = { Text(appName) },
-                    supportingContent = {
-                        Text(
-                            "${item.usageTime / 60000} minutes"
+                    item {
+                        AppManagerPanel(context = context, apps = apps)
+                    }
+                    item {
+                        UsageIntelligencePanel(
+                            context = context,
+                            usageAccess = usageAccess,
+                            appNames = apps.associate { it.packageName to it.name }
                         )
                     }
-                )
+                    item {
+                        Text("Top App Usage (Last 24 Hours)", style = MaterialTheme.typography.titleLarge)
+                    }
+                    items(usage.take(10)) { appUsage ->
+                        val appName = apps.find {
+                            it.packageName == appUsage.packageName
+                        }?.name ?: appUsage.packageName
+
+                        ListItem(
+                            headlineContent = { Text(appName) },
+                            supportingContent = {
+                                Text("${appUsage.usageTime / 60000} minutes")
+                            }
+                        )
+                    }
+                }
+
+                4 -> {
+                    item {
+                        Text("Device Tools & Settings", style = MaterialTheme.typography.headlineMedium)
+                    }
+                    item {
+                        ThemeSettingsPanel(
+                            context = context,
+                            selectedMode = themeMode,
+                            onModeChange = onThemeChange
+                        )
+                    }
+                    item { PermissionIntelligencePanel(context) }
+                    item { DeviceDiagnosticsPanel(context) }
+                    item { BackgroundMonitoringPanel(context) }
+                    item { DeviceAlertPanel(context) }
+                    item { DeviceSecurityInsightsPanel(context) }
+                    item { DeviceCapabilityPanel(context) }
+                    item { DeviceActivityTimelinePanel(context) }
+                    item {
+                        ReportExportPanel(
+                            context = context,
+                            usageAccess = usageAccess
+                        )
+                    }
+                    item { LocalBackupPanel(context) }
+                }
             }
         }
     }
