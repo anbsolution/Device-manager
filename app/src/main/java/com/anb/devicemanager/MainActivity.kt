@@ -23,6 +23,7 @@ import com.anb.devicemanager.ui.PermissionIntelligencePanel
 
 import com.anb.devicemanager.ui.DeviceDiagnosticsPanel
 import com.anb.devicemanager.ui.DeviceHealthPanel
+import com.anb.devicemanager.ui.ReportExportPanel
 import com.anb.devicemanager.ui.UsageIntelligencePanel
 
 
@@ -141,6 +142,13 @@ fun Dashboard(
 
             item {
                 DeviceHealthPanel(context)
+            }
+
+            item {
+                ReportExportPanel(
+                    context = context,
+                    usageAccess = usageAccess
+                )
             }
 
             item {
