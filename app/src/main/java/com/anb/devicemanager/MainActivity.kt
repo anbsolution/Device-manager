@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.anb.devicemanager.monitoring.*
 import com.anb.devicemanager.ui.SystemMetricsPanel
+import com.anb.devicemanager.ui.BatteryIntelligencePanel
 import com.anb.devicemanager.ui.AppManagerPanel
 
 
@@ -117,30 +118,7 @@ fun Dashboard(
             }
 
             item {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text("Battery")
-                        Text(
-                            battery?.let {
-                                if (it.percentage >= 0)
-                                    "${it.percentage}%"
-                                else "Unavailable"
-                            } ?: "Unavailable",
-                            style = MaterialTheme.typography.headlineLarge
-                        )
-                        Text(
-                            battery?.let {
-                                if (it.temperature >= 0)
-                                    "Temperature: ${it.temperature} °C"
-                                else "Temperature unavailable"
-                            } ?: "Temperature unavailable"
-                        )
-                        Text(
-                            if (battery?.charging == true)
-                                "Charging" else "Not charging"
-                        )
-                    }
-                }
+                BatteryIntelligencePanel(context)
             }
 
             item {
