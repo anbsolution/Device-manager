@@ -32,6 +32,12 @@ interface DeviceSnapshotDao {
 
     @Query("SELECT COUNT(*) FROM device_snapshots")
     suspend fun getCount(): Int
+
+    @Query("SELECT * FROM device_snapshots WHERE timestamp >= :since ORDER BY timestamp ASC")
+    suspend fun getSince(since: Long): List<DeviceSnapshot>
+
+    @Query("SELECT * FROM device_snapshots ORDER BY timestamp DESC LIMIT 1")
+    suspend fun getLatest(): DeviceSnapshot?
 }
 
 @Database(
