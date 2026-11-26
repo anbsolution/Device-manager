@@ -33,6 +33,7 @@ import com.anb.devicemanager.ui.MaintenanceRecommendationsPanel
 import com.anb.devicemanager.ui.DeviceSecurityInsightsPanel
 import com.anb.devicemanager.ui.DeviceCapabilityPanel
 import com.anb.devicemanager.ui.DeviceActivityTimelinePanel
+import com.anb.devicemanager.ui.DeviceBenchmarkPanel
 
 
 class MainActivity : ComponentActivity() {
@@ -178,6 +179,10 @@ fun Dashboard(
 
             item {
                 DeviceActivityTimelinePanel(context)
+            }
+
+            item {
+                DeviceBenchmarkPanel(context)
             }
 
             item {
