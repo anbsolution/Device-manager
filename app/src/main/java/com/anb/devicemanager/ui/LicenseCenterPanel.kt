@@ -1,9 +1,11 @@
 package com.anb.devicemanager.ui
 
 import android.content.Context
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,6 +16,13 @@ import com.anb.devicemanager.license.LicenseManager
 fun LicenseCenterPanel(context: Context) {
     val prefs = remember {
         context.getSharedPreferences("anb_license_store", Context.MODE_PRIVATE)
+    }
+
+    val deviceId = remember {
+        Settings.Secure.getString(
+            context.contentResolver,
+            Settings.Secure.ANDROID_ID
+        ) ?: "Unavailable"
     }
 
     var ownershipText by remember {
@@ -89,6 +98,17 @@ fun LicenseCenterPanel(context: Context) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text("ANB Solution Licence Center", style = MaterialTheme.typography.titleLarge)
+            Text("Device ID", style = MaterialTheme.typography.titleMedium)
+            SelectionContainer {
+                Text(deviceId, style = MaterialTheme.typography.bodyMedium)
+            }
+            Text(
+                "Use this ID when issuing a licence for this installation.",
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            HorizontalDivider()
+
             Text("Ownership Certificate", style = MaterialTheme.typography.titleMedium)
             Text(ownershipStatus, style = MaterialTheme.typography.bodyMedium)
             Button(
