@@ -34,6 +34,14 @@ class DeviceMonitoringWorker(
                 .snapshotDao()
                 .insert(snapshot)
 
+            DeviceAlertNotifier.evaluateAndNotify(
+                context = applicationContext,
+                ramPercent = ramPercent,
+                storagePercent = storage.usedPercent,
+                batteryTemperature = battery?.temperature ?: -1f,
+                thermalStatus = performance.thermalStatus
+            )
+
             applicationContext.getSharedPreferences(
                 "anb_device_monitoring",
                 Context.MODE_PRIVATE
