@@ -97,6 +97,8 @@ fun LiveNetworkSpeedIndicator(context: Context) {
         }
     }
 
+    val currentSignalLevel = signal.signalLevel
+
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surfaceVariant
@@ -140,7 +142,7 @@ fun LiveNetworkSpeedIndicator(context: Context) {
                         "Signal",
                         style = MaterialTheme.typography.labelMedium
                     )
-                    if (signal.signalLevel != null) {
+                    if (currentSignalLevel != null) {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(2.dp),
                             verticalAlignment = Alignment.Bottom
@@ -150,7 +152,7 @@ fun LiveNetworkSpeedIndicator(context: Context) {
                                     modifier = Modifier
                                         .width(4.dp)
                                         .height((6 + index * 3).dp),
-                                    color = if (index < signal.signalLevel) {
+                                    color = if (index < currentSignalLevel) {
                                         MaterialTheme.colorScheme.primary
                                     } else {
                                         MaterialTheme.colorScheme.outlineVariant
