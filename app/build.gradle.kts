@@ -13,8 +13,8 @@ android {
         applicationId = "com.anb.devicemanager"
         minSdk = 26
         targetSdk = 35
-        versionCode = 26
-        versionName = "3.5.0"
+        versionCode = 27
+        versionName = "3.6.0"
     }
 
     compileOptions {
