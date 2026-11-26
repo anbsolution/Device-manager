@@ -1,0 +1,6 @@
+
+
+# ANB signing material - never commit
+*.jks
+*.keystore
+*.base64
