@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.anb.devicemanager.monitoring.*
 import com.anb.devicemanager.ui.SystemMetricsPanel
+import com.anb.devicemanager.ui.DashboardQuickStatusPanel
 import com.anb.devicemanager.ui.BatteryIntelligencePanel
 import com.anb.devicemanager.ui.AppManagerPanel
 import com.anb.devicemanager.ui.StorageIntelligencePanel
@@ -184,6 +185,12 @@ fun Dashboard(
                 0 -> {
                     item {
                         Text("Device Overview", style = MaterialTheme.typography.headlineMedium)
+                    }
+                    item {
+                        DashboardQuickStatusPanel(
+                            appCount = apps.size,
+                            battery = battery
+                        )
                     }
                     item { SystemMetricsPanel(context) }
                     item { DeviceHealthPanel(context) }
