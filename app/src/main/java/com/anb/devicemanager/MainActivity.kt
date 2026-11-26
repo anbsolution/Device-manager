@@ -34,6 +34,7 @@ import com.anb.devicemanager.ui.DeviceSecurityInsightsPanel
 import com.anb.devicemanager.ui.DeviceCapabilityPanel
 import com.anb.devicemanager.ui.DeviceActivityTimelinePanel
 import com.anb.devicemanager.ui.DeviceBenchmarkPanel
+import com.anb.devicemanager.ui.BatteryAnalyticsPanel
 
 
 class MainActivity : ComponentActivity() {
@@ -183,6 +184,10 @@ fun Dashboard(
 
             item {
                 DeviceBenchmarkPanel(context)
+            }
+
+            item {
+                BatteryAnalyticsPanel(context)
             }
 
             item {
