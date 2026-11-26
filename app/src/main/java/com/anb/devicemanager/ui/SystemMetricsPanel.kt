@@ -25,11 +25,21 @@ fun SystemMetricsPanel(context: Context) {
     var network by remember {
         mutableStateOf<NetworkInfo?>(null)
     }
+    var backgroundEvents by remember {
+        mutableStateOf<Map<String, Int>>(emptyMap())
+    }
 
     fun refresh() {
         performance = PerformanceMonitor(context).getMetrics()
         storage = StorageMonitor().getStorageInfo()
-        network = NetworkMonitor(context).getNetworkInfo()\n        backgroundEvents = try {\n            BackgroundActivityMonitor(context).getBackgroundTransitions()\n        } catch (_: Exception) { emptyMap() }
+        network = NetworkMonitor(context).getNetworkInfo()
+
+        backgroundEvents = try {
+            BackgroundActivityMonitor(context)
+                .getBackgroundTransitions()
+        } catch (_: Exception) {
+            emptyMap()
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -67,7 +77,8 @@ fun SystemMetricsPanel(context: Context) {
                 )
                 Text(
                     if (performance?.lowMemory == true)
-                        "Low memory warning" else "Memory status normal"
+                        "Low memory warning"
+                    else "Memory status normal"
                 )
             }
         }
@@ -83,9 +94,7 @@ fun SystemMetricsPanel(context: Context) {
                 Text(
                     "Thermal: ${performance?.thermalStatus ?: "Unavailable"}"
                 )
-                Text(
-                    "CPU utilization: Not available from standard API"
-                )
+                Text("CPU utilization: Not available from standard API")
             }
         }
 
@@ -93,9 +102,8 @@ fun SystemMetricsPanel(context: Context) {
             Column(Modifier.padding(16.dp)) {
                 Text("Internal Storage")
                 Text(
-                    storage?.let {
-                        "${it.usedPercent}% used"
-                    } ?: "Unavailable",
+                    storage?.let { "${it.usedPercent}% used" }
+                        ?: "Unavailable",
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
@@ -121,7 +129,9 @@ fun SystemMetricsPanel(context: Context) {
                         .sortedByDescending { it.value }
                         .take(5)
                         .forEach { entry ->
-                            Text("${entry.key}: ${entry.value} transitions")
+                            Text(
+                                "${entry.key}: ${entry.value} transitions"
+                            )
                         }
                 }
                 Text("Transitions are not background runtime.")
@@ -137,14 +147,16 @@ fun SystemMetricsPanel(context: Context) {
                 )
                 Text(
                     "App received: ${
-                        network?.let { formatBytes(it.receivedBytes) }
-                            ?: "Unavailable"
+                        network?.let {
+                            formatBytes(it.receivedBytes)
+                        } ?: "Unavailable"
                     }"
                 )
                 Text(
                     "App transmitted: ${
-                        network?.let { formatBytes(it.transmittedBytes) }
-                            ?: "Unavailable"
+                        network?.let {
+                            formatBytes(it.transmittedBytes)
+                        } ?: "Unavailable"
                     }"
                 )
                 Text("Traffic values are for this app only")
