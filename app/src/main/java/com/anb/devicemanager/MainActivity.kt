@@ -15,6 +15,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.anb.devicemanager.monitoring.*
+import com.anb.devicemanager.ui.SystemMetricsPanel
+
 
 class MainActivity : ComponentActivity() {
 
@@ -107,6 +109,10 @@ fun Dashboard(
                     "Device Overview",
                     style = MaterialTheme.typography.headlineMedium
                 )
+            }
+
+            item {
+                SystemMetricsPanel(context)
             }
 
             item {
