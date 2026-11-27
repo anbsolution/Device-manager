@@ -51,6 +51,7 @@ import com.anb.devicemanager.ui.NetworkSignalAlertPanel
 import com.anb.devicemanager.ui.NetworkQualityDiagnosticsPanel
 import com.anb.devicemanager.ui.ThemeSettingsPanel
 import com.anb.devicemanager.ui.LicenseCenterPanel
+import com.anb.devicemanager.license.LicenseManager
 import com.anb.devicemanager.ui.theme.AnbThemeMode
 import com.anb.devicemanager.ui.theme.AnbDeviceManagerTheme
 
@@ -121,6 +122,10 @@ fun Dashboard(
         mutableStateOf(0)
     }
 
+    var licenseActive by remember {
+        mutableStateOf(LicenseManager.isAppActivated(context))
+    }
+
     fun refresh() {
         apps = AppInventoryMonitor(context).getInstalledApps()
         battery = BatteryMonitor(context).getBatteryInfo()
@@ -162,15 +167,23 @@ fun Dashboard(
         },
         bottomBar = {
             NavigationBar {
-                val labels = listOf("Home", "Network", "Battery", "Apps", "Tools")
-                val symbols = listOf("⌂", "◉", "▰", "▦", "⚙")
-
-                labels.forEachIndexed { index, label ->
+                if (licenseActive) {
+                    val labels = listOf("Home", "Network", "Battery", "Apps", "Tools")
+                    val symbols = listOf("⌂", "◉", "▰", "▦", "⚙")
+                    labels.forEachIndexed { index, label ->
+                        NavigationBarItem(
+                            selected = selectedTab == index,
+                            onClick = { selectedTab = index },
+                            icon = { Text(symbols[index]) },
+                            label = { Text(label) }
+                        )
+                    }
+                } else {
                     NavigationBarItem(
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index },
-                        icon = { Text(symbols[index]) },
-                        label = { Text(label) }
+                        selected = true,
+                        onClick = { selectedTab = 4 },
+                        icon = { Text("⚙") },
+                        label = { Text("Activate") }
                     )
                 }
             }
@@ -183,7 +196,16 @@ fun Dashboard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            when (selectedTab) {
+            if (!licenseActive) {
+                item {
+                    LicenseCenterPanel(
+                        context = context,
+                        onActivationChanged = { active ->
+                            licenseActive = active
+                        }
+                    )
+                }
+            } else when (selectedTab) {
                 0 -> {
                     item {
                         Text("Device Overview", style = MaterialTheme.typography.headlineMedium)
@@ -290,7 +312,14 @@ fun Dashboard(
                     item {
                         Text("Device Tools & Settings", style = MaterialTheme.typography.headlineMedium)
                     }
-                    item { LicenseCenterPanel(context) }
+                    item {
+                        LicenseCenterPanel(
+                            context = context,
+                            onActivationChanged = { active ->
+                                licenseActive = active
+                            }
+                        )
+                    }
                     item {
                         ThemeSettingsPanel(
                             context = context,

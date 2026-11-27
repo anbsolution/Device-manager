@@ -13,7 +13,10 @@ import androidx.compose.ui.unit.dp
 import com.anb.devicemanager.license.LicenseManager
 
 @Composable
-fun LicenseCenterPanel(context: Context) {
+fun LicenseCenterPanel(
+    context: Context,
+    onActivationChanged: (Boolean) -> Unit = {}
+) {
     val prefs = remember {
         context.getSharedPreferences("anb_license_store", Context.MODE_PRIVATE)
     }
@@ -34,7 +37,7 @@ fun LicenseCenterPanel(context: Context) {
     var ownershipStatus by remember { mutableStateOf("Not installed") }
     var customerStatus by remember { mutableStateOf("Not installed") }
 
-    fun validateSaved() {
+    fun refreshStatus() {
         ownershipStatus = ownershipText?.let {
             val result = LicenseManager.verify(context, it, "ownership")
             if (result.valid) "Verified • ${result.message}" else result.message
@@ -44,10 +47,12 @@ fun LicenseCenterPanel(context: Context) {
             val result = LicenseManager.verify(context, it, "customer")
             if (result.valid) "Verified • ${result.message}" else result.message
         } ?: "Not installed"
+
+        onActivationChanged(LicenseManager.isAppActivated(context))
     }
 
     LaunchedEffect(ownershipText, customerText) {
-        validateSaved()
+        refreshStatus()
     }
 
     val ownershipPicker = rememberLauncherForActivityResult(
@@ -65,6 +70,7 @@ fun LicenseCenterPanel(context: Context) {
                     ownershipText = text
                     "Verified • ${result.message}"
                 } else result.message
+                onActivationChanged(LicenseManager.isAppActivated(context))
             }.onFailure {
                 ownershipStatus = "Unable to read certificate."
             }
@@ -86,6 +92,7 @@ fun LicenseCenterPanel(context: Context) {
                     customerText = text
                     "Verified • ${result.message}"
                 } else result.message
+                onActivationChanged(LicenseManager.isAppActivated(context))
             }.onFailure {
                 customerStatus = "Unable to read licence."
             }
@@ -98,6 +105,8 @@ fun LicenseCenterPanel(context: Context) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text("ANB Solution Licence Center", style = MaterialTheme.typography.titleLarge)
+            Text("Activation: ${if (LicenseManager.isAppActivated(context)) "Active" else "Required"}",
+                style = MaterialTheme.typography.titleMedium)
             Text("Device ID", style = MaterialTheme.typography.titleMedium)
             SelectionContainer {
                 Text(deviceId, style = MaterialTheme.typography.bodyMedium)
@@ -108,7 +117,6 @@ fun LicenseCenterPanel(context: Context) {
             )
 
             HorizontalDivider()
-
             Text("Ownership Certificate", style = MaterialTheme.typography.titleMedium)
             Text(ownershipStatus, style = MaterialTheme.typography.bodyMedium)
             Button(
@@ -119,7 +127,6 @@ fun LicenseCenterPanel(context: Context) {
             }
 
             HorizontalDivider()
-
             Text("Customer / Device Licence", style = MaterialTheme.typography.titleMedium)
             Text(customerStatus, style = MaterialTheme.typography.bodyMedium)
             Button(

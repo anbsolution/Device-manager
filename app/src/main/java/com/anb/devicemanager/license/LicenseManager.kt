@@ -11,6 +11,8 @@ import java.security.spec.X509EncodedKeySpec
 object LicenseManager {
     private const val ISSUER = "ANB Solution"
     private const val PRODUCT = "ANB Device Manager"
+    private const val MAX_ENVELOPE_LENGTH = 65536
+    private const val MAX_FUTURE_SKEW_SECONDS = 300L
 
     private const val PUBLIC_KEY_PEM = """
 -----BEGIN PUBLIC KEY-----
@@ -33,15 +35,43 @@ AiZwCcTy+AZz0RjzlL/DoIXqhYK5W1nTKH92AqY9v5uBAgMBAAE=
         val licenseType: String = ""
     )
 
+    fun isAppActivated(context: Context): Boolean {
+        val prefs = context.getSharedPreferences(
+            "anb_license_store",
+            Context.MODE_PRIVATE
+        )
+        val ownership = prefs.getString("ownership_certificate", null)
+        val customer = prefs.getString("customer_license", null)
+
+        return (ownership != null &&
+            verify(context, ownership, "ownership").valid) ||
+            (customer != null &&
+            verify(context, customer, "customer").valid)
+    }
+
     fun verify(
         context: Context,
         envelopeText: String,
         expectedType: String
     ): Result {
         return try {
+            if (expectedType != "ownership" && expectedType != "customer") {
+                return Result(false, "Unsupported expected licence type.")
+            }
+
+            if (envelopeText.isBlank() ||
+                envelopeText.length > MAX_ENVELOPE_LENGTH
+            ) {
+                return Result(false, "Licence file is empty or too large.")
+            }
+
             val envelope = JSONObject(envelopeText)
             val payloadEncoded = envelope.getString("payload")
             val signatureEncoded = envelope.getString("signature")
+
+            if (payloadEncoded.isBlank() || signatureEncoded.isBlank()) {
+                return Result(false, "Licence envelope is incomplete.")
+            }
 
             val payloadBytes = Base64.decode(
                 payloadEncoded,
@@ -51,6 +81,14 @@ AiZwCcTy+AZz0RjzlL/DoIXqhYK5W1nTKH92AqY9v5uBAgMBAAE=
                 signatureEncoded,
                 Base64.DEFAULT
             )
+
+            if (payloadBytes.isEmpty() || payloadBytes.size > 49152) {
+                return Result(false, "Invalid licence payload size.")
+            }
+
+            if (signatureBytes.size != 384) {
+                return Result(false, "Invalid digital signature format.")
+            }
 
             val pemBody = PUBLIC_KEY_PEM
                 .replace("-----BEGIN PUBLIC KEY-----", "")
@@ -69,9 +107,7 @@ AiZwCcTy+AZz0RjzlL/DoIXqhYK5W1nTKH92AqY9v5uBAgMBAAE=
                 return Result(false, "Invalid digital signature.")
             }
 
-            val payload = JSONObject(
-                payloadBytes.toString(Charsets.UTF_8)
-            )
+            val payload = JSONObject(payloadBytes.toString(Charsets.UTF_8))
 
             if (payload.optString("issuer") != ISSUER) {
                 return Result(false, "Unknown licence issuer.")
@@ -88,33 +124,62 @@ AiZwCcTy+AZz0RjzlL/DoIXqhYK5W1nTKH92AqY9v5uBAgMBAAE=
                 return Result(false, "Unexpected licence type.")
             }
 
+            val licenseId = payload.optString("licenseId")
+            if (!Regex("^ANB-[0-9A-F]{16}$").matches(licenseId)) {
+                return Result(false, "Invalid licence ID.")
+            }
+
+            val customerName = payload.optString("customerName").trim()
+            if (customerName.isEmpty() || customerName.length > 200) {
+                return Result(false, "Invalid customer name.")
+            }
+
+            val nowSeconds = System.currentTimeMillis() / 1000L
+            val issuedAt = payload.optLong("issuedAt", -1L)
+
+            if (issuedAt <= 0L) {
+                return Result(false, "Invalid issue date.")
+            }
+            if (issuedAt > nowSeconds + MAX_FUTURE_SKEW_SECONDS) {
+                return Result(false, "Licence issue date is in the future.")
+            }
+
+            val expiresAt = payload.optLong("expiresAt", -1L)
+            if (expiresAt < 0L) {
+                return Result(false, "Invalid expiry date.")
+            }
+            if (expiresAt > 0L && expiresAt <= issuedAt) {
+                return Result(false, "Invalid licence validity period.")
+            }
+            if (expiresAt > 0L && nowSeconds > expiresAt) {
+                return Result(false, "Licence has expired.")
+            }
+
+            val deviceId = payload.optString("deviceId")
             if (type == "ownership") {
-                if (payload.optString("deviceId") != "*") {
+                if (deviceId != "*") {
                     return Result(false, "Invalid ownership certificate scope.")
                 }
-            } else if (type == "customer") {
+            } else {
+                if (deviceId.isBlank() || deviceId == "*") {
+                    return Result(false, "Invalid customer device binding.")
+                }
+
                 val currentDeviceId = Settings.Secure.getString(
                     context.contentResolver,
                     Settings.Secure.ANDROID_ID
                 ) ?: return Result(false, "Device identifier unavailable.")
 
-                if (payload.optString("deviceId") != currentDeviceId) {
+                if (deviceId != currentDeviceId) {
                     return Result(false, "Licence is for another device.")
                 }
-            } else {
-                return Result(false, "Unsupported licence type.")
-            }
-
-            val expiresAt = payload.optLong("expiresAt", 0L)
-            if (expiresAt > 0L && System.currentTimeMillis() > expiresAt) {
-                return Result(false, "Licence has expired.")
             }
 
             Result(
                 true,
                 if (expiresAt == 0L) "Valid • Lifetime"
                 else "Valid • Time-based",
-                payload.optString("licenseId"),
+                licenseId,
                 type
             )
         } catch (_: Exception) {
